@@ -11,6 +11,13 @@ class index_calculus():
         self.n = n
         self.p = n - 1
         self.c = 3.38
+        self.k_list = []
+
+    def check_k(self, num):
+        if num in self.k_list:
+            return 0
+        else:
+            return 1
 
     def generate_factor_base(self):
         size = ceil(self.c * exp(0.5 * (sqrt(log(self.n) * log(log(self.n))))))
@@ -22,6 +29,9 @@ class index_calculus():
     
     def make_equation(self):
         k = randint(1, self.n)
+        while self.check_k(k) == 0:
+            k = randint(1, self.n)
+        self.k_list.append(k)
         alpha_k = (self.alpha**k) % self.n
         sp = []
         for i in factorint(alpha_k).keys():
@@ -33,39 +43,42 @@ class index_calculus():
         for i in sp:
             ind = self.generate_factor_base().index(i)
             res[ind] = i
-        return res
+        if sum(res) == 0:
+            return
+        return res, k
     
     def make_system(self):
         # print(self.generate_factor_base())
         system = []
+        k = []
         while len(system) <= len(self.generate_factor_base()) + 2:
             eq = self.make_equation()
             if eq:
-                system.append(eq)
-                print(eq)
-            
-        print('******************************************')
+                system.append(eq[0])
+                k.append(eq[1])
+        new_system = self.check_system(system, k)
+        result = []
+        for i in range(len(new_system[1])):
+            result.append((new_system[1][i], new_system[0][i]))
+        return dict(result)
         
-        new_eq = self.check_system(system)
-        print(*new_eq)
-        
-    def check_system(self, system):
+    def check_system(self, system, k):
         checker = [0] * len(system[0])
         for i in system:
             for j in range(len(i)):
                 checker[j] = checker[j] + i[j]
-        print(checker)
         while 0 in checker:
             ind_zero = checker.index(0)
             new_eq = self.make_equation()
             if new_eq:
-                while new_eq[ind_zero] == 0:
+                while new_eq[0][ind_zero] == 0:
                     new_eq = None
                     while new_eq is None:
                         new_eq = self.make_equation()
-                system.append(new_eq)
+                system.append(new_eq[0])
+                k.append(new_eq[1])
                 checker[ind_zero] = -1
-        return system
+        return system, k
         
         
                 
