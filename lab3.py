@@ -23,9 +23,6 @@ class index_calculus():
         size = ceil(self.c * exp(0.5 * (sqrt(log(self.n) * log(log(self.n))))))
         factor_base = [prime for prime in primerange(2, size+1)]
         return factor_base
-
-    # def get_canonical_form(self):
-    #     return [prime for prime in factorint(self.p)]
     
     def make_equation(self):
         k = randint(1, self.n)
@@ -33,16 +30,22 @@ class index_calculus():
             k = randint(1, self.n)
         self.k_list.append(k)
         alpha_k = (self.alpha**k) % self.n
-        sp = []
-        for i in factorint(alpha_k).keys():
-            if i in self.generate_factor_base():
-                sp.append(i)
+        key = []
+        value = []
+        canonical_form = factorint(alpha_k)
+        can_key = [i for i in canonical_form.keys()]
+        can_val = [i for i in canonical_form.values()]
+
+        for i in range(len(can_key)):
+            if can_key[i] in self.generate_factor_base():
+                key.append(can_key[i])
+                value.append(can_val[i])
             else:
                 return
         res = [0] * len(self.generate_factor_base())
-        for i in sp:
-            ind = self.generate_factor_base().index(i)
-            res[ind] = i
+        for i in range(len(key)):
+            ind = self.generate_factor_base().index(key[i])
+            res[ind] = value[i]
         if sum(res) == 0:
             return
         return res, k
